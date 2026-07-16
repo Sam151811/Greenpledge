@@ -1,0 +1,26 @@
+# GreenPledge — example subgraph query (Remix IDE .subgraph format)
+# Open this file in Remix IDE to run the query directly, or right-click →
+# "Create dApp from Subgraph Query" to auto-generate a front-end with Remix AI.
+#
+# Endpoint below is a placeholder for a deployed GreenPledge subgraph indexing
+# PledgeCreated / PledgeResolved events from:
+# 0xfE0fC32195120566cC33F4328525b32CE0683dD7 (Sepolia)
+
+# endpoint: https://api.studio.thegraph.com/query/<id>/greenpledge/v0.0.1
+
+{
+  pledges(orderBy: stake, orderDirection: desc, first: 10) {
+    id
+    creator
+    verifier
+    stake
+    category
+    status
+    description
+  }
+  resolutions(where: { status: "Succeeded" }) {
+    id
+    creator
+    stake
+  }
+}

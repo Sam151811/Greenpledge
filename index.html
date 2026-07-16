@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GreenPledge — stake-backed climate commitments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Public+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F5EE; --card:#FFFFFF; --line:#D8E0D3;
+    --ink:#1E3226; --muted:#5E7264;
+    --green:#2F7D4F; --green-deep:#1F5C39;
+    --amber:#B4762A; --rust:#A0442C; --grey:#7A8578;
+    --shadow:0 1px 2px rgba(30,50,38,.06), 0 4px 14px rgba(30,50,38,.06);
+    --r:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Public Sans",system-ui,-apple-system,sans-serif;
+    font-size:15px; line-height:1.55;
+    min-height:100vh;
+  }
+  .mono{font-family:"Spline Sans Mono",ui-monospace,monospace}
+  a{color:var(--green-deep)}
+
+  /* ---------- header ---------- */
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:18px clamp(16px,4vw,48px);
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    position:sticky;top:0;z-index:20;
+  }
+  .wordmark{font-family:"Fraunces",Georgia,serif;font-weight:650;font-size:1.35rem;letter-spacing:-.01em}
+  .wordmark span{color:var(--green)}
+  .hd-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .pill{
+    font-size:.78rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);color:var(--muted);
+  }
+  .pill.ok{border-color:#BFDCC9;background:#EAF4EC;color:var(--green-deep)}
+  .pill.warn{border-color:#E7D3B0;background:#F8EFDC;color:var(--amber)}
+  button{
+    font:inherit;cursor:pointer;border:none;border-radius:var(--r);
+    padding:9px 16px;font-weight:600;
+    transition:transform .08s ease, box-shadow .12s ease, background .12s ease;
+  }
+  button:focus-visible{outline:3px solid #9CC7AB;outline-offset:2px}
+  button:active{transform:translateY(1px)}
+  .btn-primary{background:var(--green);color:#fff}
+  .btn-primary:hover{background:var(--green-deep)}
+  .btn-ghost{background:transparent;color:var(--green-deep);border:1px solid var(--line)}
+  .btn-ghost:hover{background:#EAF0E8}
+  .btn-danger{background:#F5E4DE;color:var(--rust)}
+  .btn-danger:hover{background:#EDD4CB}
+  button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  main{max-width:1060px;margin:0 auto;padding:28px clamp(16px,4vw,48px) 90px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:26px 0 10px}
+  .hero h1{
+    font-family:"Fraunces",Georgia,serif;font-weight:650;
+    font-size:clamp(1.7rem,4vw,2.5rem);letter-spacing:-.015em;line-height:1.12;
+    max-width:22ch;
+  }
+  .hero h1 em{font-style:italic;color:var(--green)}
+  .hero p{margin-top:10px;color:var(--muted);max-width:62ch}
+  .hero .contractline{margin-top:12px;font-size:.8rem}
+
+  /* ---------- credits strip ---------- */
+  .credits{
+    display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 6px;
+  }
+  .credit{
+    display:flex;align-items:center;gap:8px;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:8px 14px;box-shadow:var(--shadow);font-size:.85rem;
+  }
+  .credit .n{font-family:"Fraunces",Georgia,serif;font-weight:650;font-size:1.15rem;color:var(--green-deep)}
+  .credit .lbl{color:var(--muted)}
+
+  /* ---------- layout ---------- */
+  .cols{display:grid;grid-template-columns:380px 1fr;gap:26px;margin-top:26px;align-items:start}
+  @media (max-width:880px){ .cols{grid-template-columns:1fr} }
+
+  .panel{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:22px;
+  }
+  .panel h2{
+    font-family:"Fraunces",Georgia,serif;font-weight:650;font-size:1.15rem;
+    margin-bottom:4px;
+  }
+  .panel .sub{color:var(--muted);font-size:.85rem;margin-bottom:16px}
+
+  label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin:12px 0 5px}
+  input,select,textarea{
+    width:100%;font:inherit;color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;background:#FBFCFA;
+    padding:9px 11px;
+  }
+  input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #9CC7AB;outline-offset:1px;border-color:var(--green)}
+  textarea{resize:vertical;min-height:64px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hint{font-size:.75rem;color:var(--muted);margin-top:4px}
+  #createBtn{width:100%;margin-top:18px;padding:12px}
+
+  /* ---------- ledger ---------- */
+  .ledger-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+  .ledger-head h2{font-family:"Fraunces",Georgia,serif;font-weight:650;font-size:1.15rem}
+  .ledger-head .count{color:var(--muted);font-size:.85rem}
+  .empty{
+    border:1.5px dashed var(--line);border-radius:14px;padding:38px 20px;
+    text-align:center;color:var(--muted);
+  }
+
+  .pledge{
+    position:relative;display:grid;grid-template-columns:96px 1fr;gap:16px;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:18px;margin-bottom:14px;overflow:hidden;
+  }
+  .stakecol{
+    border-right:1px dashed var(--line);padding-right:14px;
+    display:flex;flex-direction:column;justify-content:center;gap:2px;
+  }
+  .stakecol .eth{font-family:"Fraunces",Georgia,serif;font-weight:650;font-size:1.25rem;color:var(--ink);line-height:1.1}
+  .stakecol .cap{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .pl-body .desc{font-weight:600;font-size:1rem;padding-right:96px}
+  .meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:.78rem;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:600}
+  .chip{
+    display:inline-block;font-size:.72rem;font-weight:600;
+    padding:2px 9px;border-radius:999px;background:#EAF0E8;color:var(--green-deep);
+    margin-bottom:6px;
+  }
+  .actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .actions button{padding:7px 13px;font-size:.85rem}
+
+  /* signature element: the status stamp */
+  .stamp{
+    position:absolute;top:14px;right:-8px;
+    transform:rotate(7deg);
+    font-family:"Spline Sans Mono",ui-monospace,monospace;
+    font-size:.72rem;font-weight:600;letter-spacing:.14em;
+    padding:4px 18px 4px 12px;
+    border:2px solid currentColor;border-right:none;border-radius:4px 0 0 4px;
+    background:rgba(255,255,255,.85);
+  }
+  .stamp.active{color:var(--amber)}
+  .stamp.succeeded{color:var(--green)}
+  .stamp.failed{color:var(--rust)}
+  .stamp.expired{color:var(--grey)}
+
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#F2F5EE;padding:11px 18px;border-radius:10px;
+    font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .18s, transform .18s;
+    max-width:min(92vw,560px);text-align:center;z-index:50;box-shadow:0 8px 30px rgba(30,50,38,.3);
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast a{color:#9CC7AB}
+
+  footer{
+    max-width:1060px;margin:0 auto;padding:0 clamp(16px,4vw,48px) 40px;
+    color:var(--muted);font-size:.78rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">Green<span>Pledge</span></div>
+  <div class="hd-right">
+    <span id="netPill" class="pill">checking network…</span>
+    <span id="acctPill" class="pill" style="display:none"></span>
+    <button id="connectBtn" class="btn-primary">Connect wallet</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Put money where your <em>meaning</em> is.</h1>
+    <p>Pledge a climate action and bond ETH to it. A verifier you trust confirms the outcome:
+       keep your word and reclaim the stake plus a soulbound impact credit —
+       break it, and the stake goes to a climate fund. Loss aversion, working for the planet.</p>
+    <p class="contractline mono">
+      Contract: <a id="contractLink" target="_blank" rel="noopener"></a> · Sepolia testnet
+    </p>
+  </section>
+
+  <div class="credits" id="credits" style="display:none">
+    <div class="credit"><span class="n" id="c1">0</span><span class="lbl">Transport</span></div>
+    <div class="credit"><span class="n" id="c2">0</span><span class="lbl">Diet</span></div>
+    <div class="credit"><span class="n" id="c3">0</span><span class="lbl">Energy</span></div>
+    <div class="credit"><span class="n" id="c4">0</span><span class="lbl">Nature</span></div>
+    <div class="credit"><span class="n" id="c5">0</span><span class="lbl">Other</span></div>
+    <div class="credit"><span class="lbl">your impact credits — soulbound, non-tradeable by design</span></div>
+  </div>
+
+  <div class="cols">
+    <section class="panel">
+      <h2>Make a pledge</h2>
+      <p class="sub">Commitments are free. Broken commitments aren't.</p>
+
+      <label for="fDesc">What are you committing to?</label>
+      <textarea id="fDesc" placeholder="e.g. Cycle to campus every day this week"></textarea>
+
+      <div class="row2">
+        <div>
+          <label for="fCat">Category</label>
+          <select id="fCat">
+            <option value="1">Transport</option>
+            <option value="2">Diet</option>
+            <option value="3">Energy</option>
+            <option value="4">Nature</option>
+            <option value="5">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="fStake">Stake (ETH)</label>
+          <input id="fStake" type="number" min="0" step="0.001" placeholder="0.005" />
+        </div>
+      </div>
+
+      <label for="fVerifier">Verifier address</label>
+      <input id="fVerifier" class="mono" placeholder="0x… someone you trust to judge honestly" />
+      <p class="hint">Must be a different address from yours.</p>
+
+      <label for="fDeadline">Deadline</label>
+      <input id="fDeadline" type="datetime-local" />
+      <p class="hint">Verifier has a 3-day grace window after this to attest.</p>
+
+      <button id="createBtn" class="btn-primary">Bond the pledge</button>
+    </section>
+
+    <section>
+      <div class="ledger-head">
+        <h2>Pledge ledger</h2>
+        <span class="count" id="ledgerCount"></span>
+      </div>
+      <div id="ledger">
+        <div class="empty">Loading pledges from Sepolia…</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Built for the Remix AI Bootcamp Build Week · Global Resilience track ·
+  Verification is social attestation today; the roadmap swaps it for hardware-signed data + ZK proofs (zkVerify).
+</footer>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<script>
+const CONTRACT_ADDRESS = "0xfE0fC32195120566cC33F4328525b32CE0683dD7";
+const CHAIN_ID = 11155111n; // Sepolia
+const CHAIN_ID_HEX = "0xaa36a7";
+const EXPLORER = "https://sepolia.etherscan.io";
+const READ_RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+
+const ABI = [
+  "function createPledge(address verifier, uint64 deadline, uint8 category, string description) payable returns (uint256)",
+  "function attest(uint256 pledgeId, bool success)",
+  "function reclaimExpired(uint256 pledgeId)",
+  "function getPledge(uint256 pledgeId) view returns (tuple(address creator, address verifier, uint96 stake, uint64 deadline, uint8 category, uint8 status, string description))",
+  "function nextPledgeId() view returns (uint256)",
+  "function balanceOf(address account, uint256 id) view returns (uint256)",
+  "function GRACE_PERIOD() view returns (uint64)"
+];
+
+const CATS = {1:"Transport",2:"Diet",3:"Energy",4:"Nature",5:"Other"};
+const STATUS = {0:"ACTIVE",1:"SUCCEEDED",2:"FAILED",3:"EXPIRED"};
+
+let readProvider = new ethers.JsonRpcProvider(READ_RPC);
+let readContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, readProvider);
+let signer = null, writeContract = null, account = null, gracePeriod = 259200n;
+
+const $ = id => document.getElementById(id);
+$("contractLink").textContent = CONTRACT_ADDRESS.slice(0,10) + "…" + CONTRACT_ADDRESS.slice(-6);
+$("contractLink").href = `${EXPLORER}/address/${CONTRACT_ADDRESS}`;
+
+function toast(html, ms=5000){
+  const t = $("toast");
+  t.innerHTML = html;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove("show"), ms);
+}
+const short = a => a.slice(0,6) + "…" + a.slice(-4);
+const same = (a,b) => a && b && a.toLowerCase() === b.toLowerCase();
+
+/* ---------------- wallet ---------------- */
+async function connect(){
+  if (!window.ethereum){
+    toast("No wallet detected. Install MetaMask, or browse the ledger read-only.");
+    return;
+  }
+  try{
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const net = await provider.getNetwork();
+    if (net.chainId !== CHAIN_ID){
+      try{
+        await window.ethereum.request({
+          method:"wallet_switchEthereumChain",
+          params:[{ chainId: CHAIN_ID_HEX }]
+        });
+      }catch(e){
+        toast("Please switch MetaMask to the Sepolia network.");
+        return;
+      }
+    }
+    // re-grab after potential switch
+    const p2 = new ethers.BrowserProvider(window.ethereum);
+    signer = await p2.getSigner();
+    account = await signer.getAddress();
+    writeContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+    $("connectBtn").style.display = "none";
+    $("acctPill").style.display = "";
+    $("acctPill").className = "pill ok mono";
+    $("acctPill").textContent = short(account);
+    $("netPill").className = "pill ok";
+    $("netPill").textContent = "Sepolia";
+
+    await Promise.all([loadCredits(), loadLedger()]);
+  }catch(e){
+    toast("Connection cancelled or failed.");
+  }
+}
+$("connectBtn").addEventListener("click", connect);
+
+if (window.ethereum){
+  window.ethereum.on?.("accountsChanged", ()=>location.reload());
+  window.ethereum.on?.("chainChanged", ()=>location.reload());
+}
+
+/* ---------------- reads ---------------- */
+async function loadCredits(){
+  if (!account) return;
+  try{
+    const ids = [1,2,3,4,5];
+    const balances = await Promise.all(ids.map(i => readContract.balanceOf(account, i)));
+    ids.forEach((i,idx)=> $("c"+i).textContent = balances[idx].toString());
+    $("credits").style.display = "";
+  }catch(e){ /* non-fatal */ }
+}
+
+async function loadLedger(){
+  const ledger = $("ledger");
+  try{
+    gracePeriod = await readContract.GRACE_PERIOD();
+    const next = await readContract.nextPledgeId();
+    const total = Number(next) - 1;
+    $("ledgerCount").textContent = total === 1 ? "1 pledge bonded" : `${total} pledges bonded`;
+
+    if (total < 1){
+      ledger.innerHTML = `<div class="empty">No pledges yet. Be the first to bond one — the form is right there.</div>`;
+      return;
+    }
+    // newest first
+    const ids = Array.from({length: total}, (_,i)=> total - i);
+    const pledges = await Promise.all(ids.map(id => readContract.getPledge(id)));
+    ledger.innerHTML = "";
+    ids.forEach((id, idx)=> ledger.appendChild(renderPledge(id, pledges[idx])));
+  }catch(e){
+    ledger.innerHTML = `<div class="empty">Couldn't reach Sepolia to load the ledger. Refresh to retry.</div>`;
+  }
+}
+
+function renderPledge(id, p){
+  const st = Number(p.status);
+  const now = Math.floor(Date.now()/1000);
+  const deadline = Number(p.deadline);
+  const graceEnd = deadline + Number(gracePeriod);
+
+  const el = document.createElement("article");
+  el.className = "pledge";
+
+  const dl = new Date(deadline*1000);
+  const dlStr = dl.toLocaleDateString(undefined,{day:"numeric",month:"short"}) + " " +
+                dl.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});
+  const timeNote = st===0
+    ? (now < deadline ? `due ${dlStr}` : (now <= graceEnd ? `deadline passed — verifier grace until ${new Date(graceEnd*1000).toLocaleDateString()}` : "grace over — creator can reclaim"))
+    : `deadline was ${dlStr}`;
+
+  el.innerHTML = `
+    <div class="stakecol">
+      <span class="eth">${ethers.formatEther(p.stake)}</span>
+      <span class="cap">ETH bonded</span>
+    </div>
+    <div class="pl-body">
+      <span class="chip">${CATS[Number(p.category)] || "Other"}</span>
+      <div class="desc"></div>
+      <div class="meta">
+        <span>pledger <b class="mono">${short(p.creator)}</b></span>
+        <span>verifier <b class="mono">${short(p.verifier)}</b></span>
+        <span>${timeNote}</span>
+        <span>#${id}</span>
+      </div>
+      <div class="actions"></div>
+    </div>
+    <span class="stamp ${STATUS[st].toLowerCase()}">${STATUS[st]}</span>
+  `;
+  el.querySelector(".desc").textContent = p.description; // safe text injection
+
+  const actions = el.querySelector(".actions");
+  if (st === 0 && account){
+    if (same(account, p.verifier) && now <= graceEnd){
+      const ok = document.createElement("button");
+      ok.className = "btn-primary"; ok.textContent = "Attest: kept ✓";
+      ok.onclick = ()=> doAttest(id, true, ok);
+      const no = document.createElement("button");
+      no.className = "btn-danger"; no.textContent = "Attest: broken ✗";
+      no.onclick = ()=> doAttest(id, false, no);
+      actions.append(ok, no);
+    }
+    if (same(account, p.creator) && now > graceEnd){
+      const rc = document.createElement("button");
+      rc.className = "btn-ghost"; rc.textContent = "Reclaim stake (verifier no-show)";
+      rc.onclick = ()=> doReclaim(id, rc);
+      actions.append(rc);
+    }
+    if (same(account, p.creator) && now <= graceEnd){
+      const note = document.createElement("span");
+      note.className = "hint"; note.textContent = "Awaiting your verifier's attestation.";
+      actions.append(note);
+    }
+  }
+  return el;
+}
+
+/* ---------------- writes ---------------- */
+function txLink(hash){ return `<a href="${EXPLORER}/tx/${hash}" target="_blank" rel="noopener">view on Etherscan</a>`; }
+
+function friendlyError(e){
+  const m = (e?.reason || e?.shortMessage || e?.message || "").toLowerCase();
+  if (m.includes("user rejected") || m.includes("denied")) return "Transaction cancelled in MetaMask.";
+  if (m.includes("badcategory")) return "Pick a valid category.";
+  if (m.includes("baddeadline")) return "Deadline must be in the future.";
+  if (m.includes("zerostake")) return "Stake must be more than 0 ETH.";
+  if (m.includes("zeroaddress")) return "Verifier must be a valid address that isn't your own.";
+  if (m.includes("notverifier")) return "Only the pledge's verifier can attest.";
+  if (m.includes("notcreator")) return "Only the pledge's creator can reclaim.";
+  if (m.includes("notactive")) return "This pledge has already been resolved.";
+  if (m.includes("deadlinepassed")) return "The attestation window has closed.";
+  if (m.includes("gracenotover")) return "The verifier's grace window hasn't ended yet.";
+  if (m.includes("insufficient funds")) return "Not enough Sepolia ETH for stake + gas.";
+  return "Transaction failed. Check the console for details.";
+}
+
+async function requireWallet(){
+  if (!writeContract) { await connect(); }
+  return !!writeContract;
+}
+
+$("createBtn").addEventListener("click", async ()=>{
+  if (!(await requireWallet())) return;
+  const btn = $("createBtn");
+  const desc = $("fDesc").value.trim();
+  const cat = Number($("fCat").value);
+  const verifier = $("fVerifier").value.trim();
+  const stake = $("fStake").value;
+  const dlRaw = $("fDeadline").value;
+
+  if (!desc) return toast("Describe the action you're pledging.");
+  if (!ethers.isAddress(verifier)) return toast("That verifier address isn't valid.");
+  if (same(verifier, account)) return toast("Your verifier must be someone other than you.");
+  if (!stake || Number(stake) <= 0) return toast("Enter a stake above 0 ETH.");
+  if (!dlRaw) return toast("Pick a deadline.");
+  const deadline = Math.floor(new Date(dlRaw).getTime()/1000);
+  if (deadline <= Math.floor(Date.now()/1000)) return toast("Deadline must be in the future.");
+
+  btn.disabled = true; btn.textContent = "Confirm in MetaMask…";
+  try{
+    const tx = await writeContract.createPledge(verifier, deadline, cat, desc, { value: ethers.parseEther(stake) });
+    btn.textContent = "Bonding on-chain…";
+    toast(`Pledge submitted — ${txLink(tx.hash)}`, 9000);
+    await tx.wait();
+    toast(`Pledge bonded ✓ ${txLink(tx.hash)}`, 9000);
+    $("fDesc").value = ""; $("fStake").value = ""; $("fVerifier").value = ""; $("fDeadline").value = "";
+    await loadLedger();
+  }catch(e){
+    console.error(e); toast(friendlyError(e), 7000);
+  }finally{
+    btn.disabled = false; btn.textContent = "Bond the pledge";
+  }
+});
+
+async function doAttest(id, success, btn){
+  if (!(await requireWallet())) return;
+  btn.disabled = true;
+  try{
+    const tx = await writeContract.attest(id, success);
+    toast(`Attestation submitted — ${txLink(tx.hash)}`, 9000);
+    await tx.wait();
+    toast(success
+      ? `Pledge #${id} kept — stake returned + impact credit minted ✓ ${txLink(tx.hash)}`
+      : `Pledge #${id} broken — stake forwarded to the climate fund. ${txLink(tx.hash)}`, 9000);
+    await Promise.all([loadLedger(), loadCredits()]);
+  }catch(e){
+    console.error(e); toast(friendlyError(e), 7000); btn.disabled = false;
+  }
+}
+
+async function doReclaim(id, btn){
+  if (!(await requireWallet())) return;
+  btn.disabled = true;
+  try{
+    const tx = await writeContract.reclaimExpired(id);
+    toast(`Reclaim submitted — ${txLink(tx.hash)}`, 9000);
+    await tx.wait();
+    toast(`Stake reclaimed from pledge #${id}. ${txLink(tx.hash)}`, 9000);
+    await loadLedger();
+  }catch(e){
+    console.error(e); toast(friendlyError(e), 7000); btn.disabled = false;
+  }
+}
+
+/* ---------------- boot ---------------- */
+(async ()=>{
+  $("netPill").textContent = "read-only";
+  await loadLedger();
+})();
+</script>
+</body>
+</html>
