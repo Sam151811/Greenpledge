@@ -4,7 +4,7 @@
 
 *Built solo in one night for the Remix AI Bootcamp Build Week — Global Resilience track.*
 
-**Live demo:** https://sam151811.github.io/greenpledge/
+**Live demo:** https://sam151811.github.io/Greenpledge/
 **Contract (Sepolia):** [`0xfE0fC32195120566cC33F4328525b32CE0683dD7`](https://sepolia.etherscan.io/address/0xfE0fC32195120566cC33F4328525b32CE0683dD7)
 **Verified source:** [Sourcify](https://repo.sourcify.dev/11155111/0xfE0fC32195120566cC33F4328525b32CE0683dD7/) · [Blockscout](https://eth-sepolia.blockscout.com/address/0xfE0fC32195120566cC33F4328525b32CE0683dD7?tab=contract)
 
